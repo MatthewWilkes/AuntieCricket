@@ -30,7 +30,6 @@ public final class R {
         public static final int action_settings=0x7f090006;
         public static final int icon=0x7f090002;
         public static final int label=0x7f090004;
-        public static final int notify=0x7f090008;
         public static final int story=0x7f090005;
         public static final int title=0x7f090003;
         public static final int updates=0x7f090000;
@@ -79,5 +78,6 @@ public final class R {
     }
     public static final class xml {
         public static final int config=0x7f040000;
+        public static final int settings=0x7f040001;
     }
 }

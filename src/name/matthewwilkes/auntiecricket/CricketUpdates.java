@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.http.HttpEntity;
@@ -18,10 +19,16 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.ListActivity;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.support.v4.app.NotificationCompat;
@@ -38,11 +45,18 @@ import android.widget.Toast;
 
 public class CricketUpdates extends Activity {
 
-	private class DownloadCricketTask extends AsyncTask<Void, Void, JSONArray> {
+	private class DownloadCricketTask extends AsyncTask<Object, Void, JSONArray> {
     	private long lastCricketNotificationTime;
+		private Object context;
 
-		protected JSONArray doInBackground(Void... params) {
-            return getCricketJSON();
+		protected JSONArray doInBackground(Object... params) {
+			this.context = params[0];
+            SharedPreferences prefs = getSharedPreferences("name.matthewwilkes.auntiecricket_preferences", 0);
+            int id = prefs.getInt("magicnumber", 23302781);
+            System.err.println(id);
+            String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id + 1) + "_HighWeb&sort=date_descending&limit=5";
+            
+            return getCricketJSON(url);
         }
         
     	protected void onPreExecute() {
@@ -50,6 +64,9 @@ public class CricketUpdates extends Activity {
 
     		SharedPreferences settings = getPreferences(0);
             this.lastCricketNotificationTime = settings.getLong("lastCricketNotification", 0);
+            
+
+            
     	}
     	
         protected void onPostExecute(JSONArray result) {
@@ -143,13 +160,34 @@ public class CricketUpdates extends Activity {
 
     }
 	
+	public class DownloadCricketPeriodic extends BroadcastReceiver {
+	    @Override
+	    public void onReceive(final Context context, Intent intent) {
+	    	DownloadCricketTask download = new DownloadCricketTask();
+			download.execute(context);
+	    }
+	}
+	
+	
+	
+    @Override
+    protected void onResume() {
+    	IntentFilter filter = new IntentFilter();
+        registerReceiver(new DownloadCricketPeriodic(), filter);
+        super.onResume();
+    }
+	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cricket_updates);
        
-        DownloadCricketTask download = new DownloadCricketTask();
-		download.execute();
+        Intent alarmIntent = new Intent(this, DownloadCricketPeriodic.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        
     }
 
 
@@ -168,9 +206,11 @@ public class CricketUpdates extends Activity {
         switch (item.getItemId()) {
             case R.id.wantsRefresh:
                 DownloadCricketTask download = new DownloadCricketTask();
-        		download.execute();
+        		download.execute(this);
                 return true;
-            case R.id.notify:
+            case R.id.action_settings:
+            	Intent intent = new Intent(this, SettingsActivity.class);
+            	startActivity(intent);
             	return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -206,14 +246,11 @@ public class CricketUpdates extends Activity {
 
     }
     
-    public JSONArray getCricketJSON() {
+    public JSONArray getCricketJSON(String url) {
         StringBuilder builder = new StringBuilder();
          
         try {
           HttpClient client = new DefaultHttpClient();
-          
-          int id = 23302781;
-          String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id + 1) + "_HighWeb&sort=date_descending&limit=5";
           
           HttpGet httpGet = new HttpGet(url);
        
