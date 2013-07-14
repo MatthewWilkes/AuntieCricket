@@ -32,6 +32,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.view.Menu;
@@ -45,16 +46,38 @@ import android.widget.Toast;
 
 public class CricketUpdates extends Activity {
 
-	private class DownloadCricketTask extends AsyncTask<Object, Void, JSONArray> {
+
+	public static final String RECEIVE_JSON = "name.matthewwilkes.auntiecricket.RECEIVE_JSON";
+
+	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+	    @Override
+	    public void onReceive(Context context, Intent intent) {
+	        if(intent.getAction().equals(RECEIVE_JSON)) {
+	            Bundle result = intent.getExtras();
+	            JSONArray data;
+				try {
+					data = new JSONArray(result.getString("data"));
+		            BaseAdapter adapter = new JSONAdapter(context, data);
+
+		            ListView UpdatesList = (ListView) findViewById(R.id.updates);
+		            Context UpdatesContext = UpdatesList.getContext();
+		            UpdatesList.setAdapter(adapter);
+		            findViewById(R.id.working).setVisibility(View.INVISIBLE);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	        }
+	    }
+	};
+
+	
+	/*private class DownloadCricketTask extends AsyncTask<Object, Void, JSONArray> {
     	private long lastCricketNotificationTime;
 		private Object context;
 
 		protected JSONArray doInBackground(Object... params) {
 			this.context = params[0];
-            SharedPreferences prefs = getSharedPreferences("name.matthewwilkes.auntiecricket_preferences", 0);
-            int id = prefs.getInt("magicnumber", 23302781);
-            System.err.println(id);
-            String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id + 1) + "_HighWeb&sort=date_descending&limit=5";
             
             return getCricketJSON(url);
         }
@@ -158,36 +181,17 @@ public class CricketUpdates extends Activity {
             //        String.valueOf(result.toString()), Toast.LENGTH_LONG).show();
             }
 
-    }
-	
-	public class DownloadCricketPeriodic extends BroadcastReceiver {
-	    @Override
-	    public void onReceive(final Context context, Intent intent) {
-	    	DownloadCricketTask download = new DownloadCricketTask();
-			download.execute(context);
-	    }
-	}
-	
-	
-	
-    @Override
-    protected void onResume() {
-    	IntentFilter filter = new IntentFilter();
-        registerReceiver(new DownloadCricketPeriodic(), filter);
-        super.onResume();
-    }
-	
+    }*/	
+		
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cricket_updates);
-       
-        Intent alarmIntent = new Intent(this, DownloadCricketPeriodic.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-        
+        LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVE_JSON);
+        bManager.registerReceiver(bReceiver, intentFilter);
     }
 
 
@@ -203,13 +207,15 @@ public class CricketUpdates extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
+    	Intent intent;
         switch (item.getItemId()) {
             case R.id.wantsRefresh:
-                DownloadCricketTask download = new DownloadCricketTask();
-        		download.execute(this);
+        		findViewById(R.id.working).setVisibility(View.VISIBLE);
+            	intent = new Intent(this, DownloadCricketService.class);
+            	startService(intent);
                 return true;
             case R.id.action_settings:
-            	Intent intent = new Intent(this, SettingsActivity.class);
+            	intent = new Intent(this, SettingsActivity.class);
             	startActivity(intent);
             	return true;
             default:
@@ -246,39 +252,6 @@ public class CricketUpdates extends Activity {
 
     }
     
-    public JSONArray getCricketJSON(String url) {
-        StringBuilder builder = new StringBuilder();
-         
-        try {
-          HttpClient client = new DefaultHttpClient();
-          
-          HttpGet httpGet = new HttpGet(url);
-       
-          HttpResponse response = client.execute(httpGet);
-          int statusCode = response.getStatusLine().getStatusCode();
-           
-          if (statusCode == 200) {
-            HttpEntity entity = response.getEntity();
-            InputStream content = entity.getContent();
-            InputStreamReader reader = new InputStreamReader(content);
-            BufferedReader buffered = new BufferedReader(reader);
-            String line;
-            while ((line = buffered.readLine()) != null) {
-              builder.append(line);
-            }
-            JSONObject cricket = new JSONObject(builder.toString());
-            
-            builder = new StringBuilder();
-            JSONArray assets = (JSONArray) ((JSONObject) cricket.get("assetlist")).get("assets");
-            return assets;
-          }
-        }
-        catch(Exception e) {
-          e.printStackTrace();
-          builder.append(e);
-        }
-		return null;
-      }
 
     
 }

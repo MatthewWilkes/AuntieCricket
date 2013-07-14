@@ -32,6 +32,9 @@
                         </intent-filter>
         </activity>
         
+        <service android:name="DownloadCricketService" >
+        </service>
+        
         </application>
 
 </manifest>
