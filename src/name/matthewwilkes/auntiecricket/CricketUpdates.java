@@ -210,7 +210,11 @@ public class CricketUpdates extends Activity {
 		Intent RegularUpdate = new Intent(this, DownloadCricketService.class);
     	PendingIntent pending = PendingIntent.getService(getApplicationContext(), 0, RegularUpdate, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()-500, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pending);
+        
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        if (prefs.getBoolean("pref_sync", true)) {
+	        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()-500, 10000, pending);
+        }
         
         // Make sure it happens the first time
         startService(RegularUpdate);
