@@ -205,6 +205,8 @@ public class CricketUpdates extends Activity {
         intentFilter.addAction(START_UPDATE);
         bManager.registerReceiver(bReceiver, intentFilter);
         
+        PreferenceManager.setDefaultValues(this, R.xml.settings, false);
+        
 		Intent RegularUpdate = new Intent(this, DownloadCricketService.class);
     	PendingIntent pending = PendingIntent.getService(getApplicationContext(), 0, RegularUpdate, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager alarmManager = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);

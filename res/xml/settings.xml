@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <CheckBoxPreference
+        android:key="pref_sync"
+        android:title="Auto update"
+        android:summary="Check for updates in the background"
+        android:defaultValue="true" />
+    
+ <EditTextPreference
+  android:name="magicnumber"
+  android:enabled="true"
+  android:persistent="true"
+  android:summary="The number from the URL of the event on BBC Sport to track"
+  android:defaultValue="23302781"
+  android:numeric="integer"
+  android:title="Magic number"
+  android:key="Magic number" />
+ 
+</PreferenceScreen>
