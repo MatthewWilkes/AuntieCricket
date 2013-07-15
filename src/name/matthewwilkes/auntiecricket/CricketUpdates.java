@@ -248,34 +248,6 @@ public class CricketUpdates extends Activity {
         }
     }
     
-    public void notifyJSON(JSONObject notify) throws JSONException {
-    	JSONObject content = (JSONObject) notify.get("content");
-        //Toast.makeText(CricketUpdates.this,
-        //        String.valueOf(notify.toString()), Toast.LENGTH_LONG).show();
-        
-        Spanned full_text = Html.fromHtml(((JSONObject) content.get("message")).get("text").toString());
-        
-        SimpleDateFormat parserSDF = new SimpleDateFormat("yyyy-mm-dd:kk:mm:ss");
-        Date date = new Date();
-        try {
-			date = parserSDF.parse(notify.get("createtime").toString().replace("T",":"));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-    	NotificationCompat.Builder mBuilder =
-    			new NotificationCompat.Builder(this)
-    			.setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle(((JSONObject) content.get("message")).get("head").toString())
-                .setContentText(full_text)
-                .setWhen(date.getTime())
-                .setStyle(new NotificationCompat.BigTextStyle()
-                	.bigText(full_text));
-    	NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    	notificationManager.notify((int) date.getTime(), mBuilder.build());
-
-    }
     
 
     

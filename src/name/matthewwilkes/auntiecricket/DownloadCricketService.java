@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -11,16 +14,25 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.IntentService;
+import android.app.NotificationManager;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.Html;
+import android.text.Spanned;
+import android.widget.ListView;
 
 public class DownloadCricketService extends IntentService {
 
@@ -83,5 +95,125 @@ public class DownloadCricketService extends IntentService {
 		return null;
       }
 
+    private class CricketNotificationTask extends AsyncTask<JSONArray, Void, Void> {
+    	private long lastCricketNotificationTime;
+		private Object context;
+
+		protected void onPreExecute() {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) context);
+			this.lastCricketNotificationTime = settings.getLong("lastCricketNotificationTime", 0);
+		}
+		
+        protected Void doInBackground(JSONArray... result) {
+            SimpleDateFormat parserSDF = new SimpleDateFormat("yyyy-mm-dd:kk:mm:ss");
+
+            for (int i = result[0].length(); i >= 0; --i) {
+                JSONObject message;
+                
+                Date date = new Date();
+                
+				try {
+					message = result[0].getJSONObject(i);
+
+	                try {
+	        			date = parserSDF.parse(message.get("createtime").toString().replace("T",":"));
+	        		} catch (ParseException e) {
+	        			// TODO Auto-generated catch block
+	        			e.printStackTrace();
+	        		}
+	                
+	                
+	                if (this.lastCricketNotificationTime > date.getTime())
+	                	continue;
+	                
+	                this.lastCricketNotificationTime  = date.getTime();
+	                String msg_type = ((JSONObject) ((JSONObject) message.get("content")).get("message")).get("type").toString();
+	                System.err.println(msg_type);
+	                if (msg_type.equals("STANDARD")) {
+	                	continue;
+	                }
+	                else if (msg_type.equals("TWEET")) {
+	                	continue;
+	                }
+	                else if (msg_type.equals("EMAIL")) {
+	                	continue;
+	                }
+	                else if (msg_type.equals("SMS")) {
+	                	continue;
+	                }
+	                else if (msg_type.equals("HANDOVER")) {
+	                	continue;
+	                }
+	                else if (msg_type.equals("WICKET")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("DROPPED_CATCH")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("UMPIRE_REVIEW")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("NOT_OUT")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("APPEAL_NOT_OUT")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("DROPPED_CATCH")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("INTERVAL")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("RUNS_50")) {
+	                	notifyJSON(message);
+	                }
+	                else if (msg_type.equals("RUNS_100")) {
+	                	notifyJSON(message);
+	                }
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            }
+            
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) context);
+			this.lastCricketNotificationTime = settings.getLong("lastCricketNotificationTime", 0);
+            Editor editor = settings.edit();
+            editor.putLong("lastCricketNotification", this.lastCricketNotificationTime);
+            editor.commit();
+			return null;
+            }
+
+
+    }
+    public void notifyJSON(JSONObject notify) throws JSONException {
+    	JSONObject content = (JSONObject) notify.get("content");
+        //Toast.makeText(CricketUpdates.this,
+        //        String.valueOf(notify.toString()), Toast.LENGTH_LONG).show();
+        
+        Spanned full_text = Html.fromHtml(((JSONObject) content.get("message")).get("text").toString());
+        
+        SimpleDateFormat parserSDF = new SimpleDateFormat("yyyy-mm-dd:kk:mm:ss");
+        Date date = new Date();
+        try {
+			date = parserSDF.parse(notify.get("createtime").toString().replace("T",":"));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
+    	NotificationCompat.Builder mBuilder =
+    			new NotificationCompat.Builder(this)
+    			.setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle(((JSONObject) content.get("message")).get("head").toString())
+                .setContentText(full_text)
+                .setWhen(date.getTime())
+                .setStyle(new NotificationCompat.BigTextStyle()
+                	.bigText(full_text));
+    	NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+    	notificationManager.notify((int) date.getTime(), mBuilder.build());
+
+    }
 
 }
