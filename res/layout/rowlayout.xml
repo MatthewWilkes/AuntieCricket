@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3.85"
             android:text="@+id/label"
+			android:textColor="#000000"
             android:textSize="26sp" />
 
         <TextView
@@ -33,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="3.85"
             android:text="@+id/label"
+			android:textColor="#444444"
             android:textSize="12sp" />
     </LinearLayout>
 
