@@ -11,7 +11,7 @@
   android:enabled="true"
   android:persistent="true"
   android:summary="The number from the URL of the event on BBC Sport to track"
-  android:defaultValue="23302781"
+  android:defaultValue="23309559"
   android:numeric="integer"
   android:title="Magic number"
   android:key="Magic number" />

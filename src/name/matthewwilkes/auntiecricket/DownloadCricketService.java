@@ -77,7 +77,7 @@ public class DownloadCricketService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(mIntent);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        int id = Integer.parseInt(prefs.getString("Magic number", "23302781"));
+        int id = Integer.parseInt(prefs.getString("Magic number", "23309559"));
         System.err.println(id);
         String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id + 1) + "_HighWeb&sort=date_descending&limit=5";
         JSONArray data = getCricketJSON(url);
