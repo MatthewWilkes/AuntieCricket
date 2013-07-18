@@ -179,6 +179,9 @@ public class DownloadCricketService extends IntentService {
 	                else if (msg_type.equals("HANDOVER")) {
 	                	continue;
 	                }
+	                else if (msg_type.equals("TOSS")) {
+	                	notifyJSON(message);
+	                }
 	                else if (msg_type.equals("WICKET")) {
 	                	notifyJSON(message);
 	                }
