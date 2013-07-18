@@ -25,7 +25,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         System.err.println("Updating..");
         if (sharedPreferences.getBoolean("pref_sync", true)) {
             System.err.println("Scheduling update");
-        	alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()-500, 10000, pending);
+        	alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()-500, (1000*60), pending);
         } else {
             System.err.println("cancelling update");
         	alarmManager.cancel(pending);        
