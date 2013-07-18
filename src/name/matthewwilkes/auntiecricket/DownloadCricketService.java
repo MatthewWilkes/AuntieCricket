@@ -94,6 +94,7 @@ public class DownloadCricketService extends IntentService {
         mIntent.putExtras(mBundle);
         
         LocalBroadcastManager.getInstance(this).sendBroadcast(mIntent);
+        new CricketNotificationTask().execute(data);
 	}
 	
     public JSONArray getCricketJSON(String url) {
@@ -132,17 +133,16 @@ public class DownloadCricketService extends IntentService {
 
     private class CricketNotificationTask extends AsyncTask<JSONArray, Void, Void> {
     	private long lastCricketNotificationTime;
-		private Object context;
 
 		protected void onPreExecute() {
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) context);
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) getApplicationContext());
 			this.lastCricketNotificationTime = settings.getLong("lastCricketNotificationTime", 0);
 		}
 		
         protected Void doInBackground(JSONArray... result) {
             SimpleDateFormat parserSDF = new SimpleDateFormat("yyyy-mm-dd:kk:mm:ss");
 
-            for (int i = result[0].length(); i >= 0; --i) {
+            for (int i = result[0].length()-1; i >= 0; --i) {
                 JSONObject message;
                 
                 Date date = new Date();
@@ -212,7 +212,7 @@ public class DownloadCricketService extends IntentService {
 				}
             }
             
-            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) context);
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) getApplicationContext());
 			this.lastCricketNotificationTime = settings.getLong("lastCricketNotificationTime", 0);
             Editor editor = settings.edit();
             editor.putLong("lastCricketNotification", this.lastCricketNotificationTime);
