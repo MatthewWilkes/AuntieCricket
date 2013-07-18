@@ -24,6 +24,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -33,6 +35,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.text.Html;
 import android.text.Spanned;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class DownloadCricketService extends IntentService {
 
@@ -44,6 +47,32 @@ public class DownloadCricketService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent arg0) {
 
+		ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		 
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		boolean isConnected = activeNetwork.isConnectedOrConnecting();
+		boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+
+		if (!isConnected) {
+			return;
+		}
+		
+		if (!isWiFi) {
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) getApplicationContext());
+			long lasttime = settings.getLong("lastExpensiveCheckTime", 0);
+			long current = System.currentTimeMillis();
+			
+			/*System.err.println(lasttime);
+			System.err.println(current);
+			*/
+			if (lasttime + (1000*60*10) > current) {
+				return;
+			}
+			Editor edit = settings.edit();
+			edit.putLong("lastExpensiveCheckTime", current);
+			edit.commit();
+		}
+		
         Intent mIntent = new Intent(CricketUpdates.START_UPDATE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(mIntent);
 
