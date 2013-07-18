@@ -82,6 +82,12 @@ public class DownloadCricketService extends IntentService {
         String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id + 1) + "_HighWeb&sort=date_descending&limit=5";
         JSONArray data = getCricketJSON(url);
         
+        if (data==null) {
+        	Toast.makeText(this,
+               String.valueOf("Couldn't fetch updates."), Toast.LENGTH_LONG).show(); 	        
+        	return;
+        }
+        
         mIntent = new Intent(CricketUpdates.RECEIVE_JSON);
         Bundle mBundle = new Bundle();
         mBundle.putString("data", data.toString());
