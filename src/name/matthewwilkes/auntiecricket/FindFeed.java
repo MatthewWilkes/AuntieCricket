@@ -144,7 +144,6 @@ public class FindFeed extends IntentService {
 		@Override
 		protected ArrayList<HashMap<String, String>> doInBackground(ArrayList<URI>... arg0) {
 	        StringBuilder builder = new StringBuilder();
-	        System.err.println("ARGH");
 	        ArrayList<HashMap<String, String>> result = new ArrayList();
 	        for (int i=0; i<arg0[0].size();i++) {
 	        	result.add((getInfoForURL(arg0[0].get(i))));
@@ -155,14 +154,12 @@ public class FindFeed extends IntentService {
 
 		protected HashMap<String, String> getInfoForURL(URI url) {
 			StringBuilder builder = new StringBuilder();
-			System.err.println("ARGH");
 			String id=null;
 			String headline=null;
 			HashMap<String, String> result = new HashMap<String, String>();
 			// TODO Auto-generated method stub
 			try {
 				HttpClient client = new DefaultHttpClient();
-
 				HttpGet httpGet = new HttpGet(url);
 				httpGet.addHeader("Accept-Encoding", "gzip");
 
