@@ -213,7 +213,7 @@ public class CricketUpdates extends Activity {
         
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         if (prefs.getBoolean("pref_sync", true)) {
-	        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()-500, 10000, pending);
+	        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime()-500, (30*1000), pending);
         }
         
         // Make sure it happens the first time
