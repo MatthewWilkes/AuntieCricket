@@ -5,15 +5,6 @@
         android:title="Auto update"
         android:summary="Check for updates in the background"
         android:defaultValue="true" />
-    
- <EditTextPreference
-  android:name="magicnumber"
-  android:enabled="true"
-  android:persistent="true"
-  android:summary="The number from the URL of the event on BBC Sport to track"
-  android:defaultValue="23309559"
-  android:numeric="integer"
-  android:title="Magic number"
-  android:key="Magic number" />
+ 
  
 </PreferenceScreen>

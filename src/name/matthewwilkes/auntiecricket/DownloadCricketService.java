@@ -77,9 +77,12 @@ public class DownloadCricketService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(mIntent);
 
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        int id = Integer.parseInt(prefs.getString("Magic number", "23309559"));
-        System.err.println(id);
-        String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id + 1) + "_HighWeb&sort=date_descending&limit=5";
+        String id = prefs.getString("feed", "23309559");
+        if (id.equals("")) {
+        	return;
+        }
+        
+        String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id) + "_HighWeb&sort=date_descending&limit=5";
         JSONArray data = getCricketJSON(url);
         
         if (data==null) {
@@ -227,10 +230,8 @@ public class DownloadCricketService extends IntentService {
     }
     public void notifyJSON(JSONObject notify) throws JSONException {
     	JSONObject content = (JSONObject) notify.get("content");
-        //Toast.makeText(CricketUpdates.this,
-        //        String.valueOf(notify.toString()), Toast.LENGTH_LONG).show();
         
-        Spanned full_text = Html.fromHtml(((JSONObject) content.get("message")).get("text").toString());
+        Spanned full_text = Html.fromHtml(((JSONObject) content.get("message")).get("text").toString().replaceAll("<img.+?>", ""));
         
         SimpleDateFormat parserSDF = new SimpleDateFormat("yyyy-mm-dd:kk:mm:ss");
         Date date = new Date();
@@ -240,6 +241,7 @@ public class DownloadCricketService extends IntentService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        
         
     	NotificationCompat.Builder mBuilder =
     			new NotificationCompat.Builder(this)

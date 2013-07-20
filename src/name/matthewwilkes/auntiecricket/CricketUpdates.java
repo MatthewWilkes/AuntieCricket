@@ -83,116 +83,6 @@ public class CricketUpdates extends Activity {
 	};
 
 	
-	/*private class DownloadCricketTask extends AsyncTask<Object, Void, JSONArray> {
-    	private long lastCricketNotificationTime;
-		private Object context;
-
-		protected JSONArray doInBackground(Object... params) {
-			this.context = params[0];
-            
-            return getCricketJSON(url);
-        }
-        
-    	protected void onPreExecute() {
-    		findViewById(R.id.working).setVisibility(View.VISIBLE);
-
-    		SharedPreferences settings = getPreferences(0);
-            this.lastCricketNotificationTime = settings.getLong("lastCricketNotification", 0);
-            
-
-            
-    	}
-    	
-        protected void onPostExecute(JSONArray result) {
-            ListView UpdatesList = (ListView) findViewById(R.id.updates);
-            Context UpdatesContext = UpdatesList.getContext();
-            BaseAdapter adapter = new JSONAdapter(UpdatesContext, result);
-            UpdatesList.setAdapter(adapter);
-            
-            
-            SimpleDateFormat parserSDF = new SimpleDateFormat("yyyy-mm-dd:kk:mm:ss");
-
-            for (int i = result.length(); i >= 0; --i) {
-                JSONObject message;
-                
-                Date date = new Date();
-                
-				try {
-					message = result.getJSONObject(i);
-
-	                try {
-	        			date = parserSDF.parse(message.get("createtime").toString().replace("T",":"));
-	        		} catch (ParseException e) {
-	        			// TODO Auto-generated catch block
-	        			e.printStackTrace();
-	        		}
-	                
-	                
-	                if (this.lastCricketNotificationTime > date.getTime())
-	                	continue;
-	                
-	                this.lastCricketNotificationTime  = date.getTime();
-	                String msg_type = ((JSONObject) ((JSONObject) message.get("content")).get("message")).get("type").toString();
-	                System.err.println(msg_type);
-	                if (msg_type.equals("STANDARD")) {
-	                	continue;
-	                }
-	                else if (msg_type.equals("TWEET")) {
-	                	continue;
-	                }
-	                else if (msg_type.equals("EMAIL")) {
-	                	continue;
-	                }
-	                else if (msg_type.equals("SMS")) {
-	                	continue;
-	                }
-	                else if (msg_type.equals("HANDOVER")) {
-	                	continue;
-	                }
-	                else if (msg_type.equals("WICKET")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("DROPPED_CATCH")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("UMPIRE_REVIEW")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("NOT_OUT")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("APPEAL_NOT_OUT")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("DROPPED_CATCH")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("INTERVAL")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("RUNS_50")) {
-	                	notifyJSON(message);
-	                }
-	                else if (msg_type.equals("RUNS_100")) {
-	                	notifyJSON(message);
-	                }
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-            }
-            
-            SharedPreferences settings = getPreferences(0);
-            Editor editor = settings.edit();
-            editor.putLong("lastCricketNotification", this.lastCricketNotificationTime);
-            editor.commit();
-            
-            findViewById(R.id.working).setVisibility(View.INVISIBLE);
-            //Toast.makeText(CricketUpdates.this,
-            //        String.valueOf(result.toString()), Toast.LENGTH_LONG).show();
-            }
-
-    }*/	
 		
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -217,7 +107,8 @@ public class CricketUpdates extends Activity {
         }
         
         // Make sure it happens the first time
-        startService(RegularUpdate);
+    	Intent intent = new Intent(this, FindFeed.class);
+    	startService(intent);
     }
 
 
@@ -235,8 +126,12 @@ public class CricketUpdates extends Activity {
         // Handle item selection
     	Intent intent;
         switch (item.getItemId()) {
-            case R.id.wantsRefresh:
-            	intent = new Intent(this, DownloadCricketService.class);
+        	case R.id.wantsRefresh:
+        		intent = new Intent(this, DownloadCricketService.class);
+        		startService(intent);
+        		return true;
+            case R.id.findFeed:
+            	intent = new Intent(this, FindFeed.class);
             	startService(intent);
                 return true;
             case R.id.action_settings:
