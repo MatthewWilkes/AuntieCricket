@@ -50,6 +50,7 @@ public class JSONAdapter extends BaseAdapter {
     	JSONObject message = (JSONObject) content.get("message");
 
     	String text = message.get("text").toString();
+    	text = text.replaceAll("<img.+?>", "");
     	
 		story.setText(Html.fromHtml(text));
 		
