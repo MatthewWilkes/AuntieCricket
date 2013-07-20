@@ -108,6 +108,17 @@ public class CricketUpdates extends Activity {
         
         // Make sure it happens the first time
     	Intent intent = new Intent(this, FindFeed.class);
+    	pending = PendingIntent.getService(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    	Date morning = new Date();
+    	morning.setHours(10);
+    	morning.setMinutes(0);
+    	
+        if (prefs.getBoolean("pref_sync", true)) {
+	        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, morning.getTime(), AlarmManager.INTERVAL_HOUR * 8, pending);
+        }
+    	
+    	
+    	
     	startService(intent);
     }
 
