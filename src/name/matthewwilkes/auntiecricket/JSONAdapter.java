@@ -167,6 +167,14 @@ public class JSONAdapter extends BaseAdapter {
 			image.setImageResource(R.drawable.ic_launcher);
 		}
 		
+    	String subhead = message.get("subhead").toString();
+
+		if (!subhead.equals("{}"))
+		{
+			title.setText(title_text + ": " + subhead);
+		}
+
+		
 	} catch (JSONException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
