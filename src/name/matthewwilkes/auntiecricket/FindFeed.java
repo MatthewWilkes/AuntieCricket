@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -75,6 +77,7 @@ public class FindFeed extends IntentService {
 				try {
 					HttpClient client = new DefaultHttpClient();
 					HttpGet httpGet = new HttpGet("http://www.bbc.co.uk/sport/0/cricket/");
+					httpGet.addHeader("Accept-Encoding", "gzip");
 
 					HttpResponse response = client.execute(httpGet);
 					int statusCode = response.getStatusLine().getStatusCode();
@@ -82,6 +85,11 @@ public class FindFeed extends IntentService {
 					if (statusCode == 200) {
 						HttpEntity entity = response.getEntity();
 						InputStream content = entity.getContent();
+						Header contentEncoding = response.getFirstHeader("Content-Encoding");
+						if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
+							content = new GZIPInputStream(content);
+						}
+						
 						InputStreamReader reader = new InputStreamReader(content);
 						BufferedReader buffered = new BufferedReader(reader);
 						String line;
@@ -156,6 +164,7 @@ public class FindFeed extends IntentService {
 				HttpClient client = new DefaultHttpClient();
 
 				HttpGet httpGet = new HttpGet(url);
+				httpGet.addHeader("Accept-Encoding", "gzip");
 
 				HttpResponse response = client.execute(httpGet);
 				int statusCode = response.getStatusLine().getStatusCode();
@@ -163,6 +172,11 @@ public class FindFeed extends IntentService {
 				if (statusCode == 200) {
 					HttpEntity entity = response.getEntity();
 					InputStream content = entity.getContent();
+					Header contentEncoding = response.getFirstHeader("Content-Encoding");
+					if (contentEncoding != null && contentEncoding.getValue().equalsIgnoreCase("gzip")) {
+						content = new GZIPInputStream(content);
+					}
+					
 					InputStreamReader reader = new InputStreamReader(content);
 					BufferedReader buffered = new BufferedReader(reader);
 					String line;
