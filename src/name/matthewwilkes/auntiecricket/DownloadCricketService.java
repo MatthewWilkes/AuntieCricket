@@ -253,10 +253,33 @@ public class DownloadCricketService extends IntentService {
 			e.printStackTrace();
 		}
         
+        String msg_type = ((JSONObject) content.get("message")).get("type").toString();
+        int icon = R.drawable.ic_ball;
+        int priority = Notification.PRIORITY_DEFAULT;
+        
+        if (msg_type.equals("TOSS")) {
+        	icon = R.drawable.ic_toss;
+        	priority = Notification.PRIORITY_LOW;
+        }
+        else if (msg_type.equals("WICKET")) {
+        	icon = R.drawable.ic_wicket;
+        	priority = Notification.PRIORITY_MAX;
+        }
+        else if (msg_type.equals("UMPIRE_REVIEW")) {
+        	icon = R.drawable.ic_umpire;
+        }
+        else if (msg_type.equals("RUNS_50")) {
+        	icon = R.drawable.ic_half_century;
+        }
+        else if (msg_type.equals("RUNS_100")) {
+        	icon = R.drawable.ic_century;
+        	priority = Notification.PRIORITY_HIGH;
+        }
+        
         
     	NotificationCompat.Builder mBuilder =
     			new NotificationCompat.Builder(this)
-    			.setSmallIcon(R.drawable.ic_launcher)
+    			.setSmallIcon(icon)
                 .setContentTitle(((JSONObject) content.get("message")).get("head").toString())
                 .setContentText(full_text)
                 .setWhen(date.getTime())

@@ -68,7 +68,7 @@ public class JSONAdapter extends BaseAdapter {
 			image.setImageResource(R.drawable.ic_wicket);
 		}
 		else { 
-			image.setImageResource(R.drawable.ic_launcher);
+			image.setImageResource(R.drawable.ic_ball);
 		}
 		
 
