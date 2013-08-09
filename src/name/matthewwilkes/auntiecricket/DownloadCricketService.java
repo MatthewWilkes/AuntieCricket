@@ -20,12 +20,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.IntentService;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -258,10 +260,13 @@ public class DownloadCricketService extends IntentService {
                 .setContentTitle(((JSONObject) content.get("message")).get("head").toString())
                 .setContentText(full_text)
                 .setWhen(date.getTime())
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .setStyle(new NotificationCompat.BigTextStyle()
                 	.bigText(full_text));
     	NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-    	notificationManager.notify((int) date.getTime(), mBuilder.build());
+    	Notification notif = mBuilder.build();
+        notif.flags |= Notification.FLAG_ONLY_ALERT_ONCE | Notification.FLAG_AUTO_CANCEL;
+    	notificationManager.notify((int) date.getTime(), notif);
 
     }
 
