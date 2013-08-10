@@ -46,6 +46,7 @@ public class DownloadCricketService extends IntentService {
 
 	public DownloadCricketService() {
 		super("DownloadCricketService");
+		new CricketNotificationTask();
 	}
 
 	@Override

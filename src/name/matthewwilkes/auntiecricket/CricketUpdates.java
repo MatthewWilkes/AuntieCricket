@@ -89,6 +89,7 @@ public class CricketUpdates extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cricket_updates);
 
+        
         LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(RECEIVE_JSON);
@@ -136,6 +137,12 @@ public class CricketUpdates extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
     	Intent intent;
+    	
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences((Context) getApplicationContext());
+        Editor editor = settings.edit();
+		editor.putLong("lastExpensiveCheckTime", 0);
+		editor.commit();
+		
         switch (item.getItemId()) {
         	case R.id.wantsRefresh:
         		intent = new Intent(this, DownloadCricketService.class);
