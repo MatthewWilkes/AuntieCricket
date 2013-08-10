@@ -87,7 +87,7 @@ public class DownloadCricketService extends IntentService {
         	return;
         }
         
-        String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id) + "_HighWeb&sort=date_descending&limit=5";
+        String url = "http://cdnedge.bbc.co.uk/shared/app/pulsar/assets/?channel=bbc.cps.asset." + (id) + "_HighWeb&sort=date_descending&limit=25";
         JSONArray data = getCricketJSON(url);
         
         if (data==null) {
