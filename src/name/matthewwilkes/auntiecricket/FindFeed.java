@@ -111,7 +111,6 @@ public class FindFeed extends IntentService {
 					e.printStackTrace();
 					builder.append(e);
 				}
-				result.add(URI.create("http://www.bbc.co.uk/sport/0/cricket/23619290"));
 				return result;
 			}
 
